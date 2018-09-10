@@ -53,13 +53,9 @@ export
 include("GridWorlds.jl")
 export
     GridWorld,
-    GridWorldState,
-    GridWorldAction,
-    GridWorldActionSpace,
-    GridWorldStateSpace,
-    GridWorldDistribution,
-    static_reward,
-    plot
+    SimpleGridWorld,
+    DiagonalGridWorld,
+    Vec2
 
 include("CryingBabies.jl")
 export

@@ -2,47 +2,46 @@ using POMDPModels
 using Test
 # using NBInclude
 
-let 
-    problem = GridWorld()
+let
+    problem = SimpleGridWorld()
 
-    # XXX simulation
-    # policy = RandomPolicy(problem)
+	s = Vec2(1,1)
+	@test POMDPModels.inbounds(problem, s) == true
 
-    # sim = HistoryRecorder(rng=MersenneTwister(1), max_steps=1000)
+	T = transition(problem, s, :down)
+	@test T.vals == [ Vec2(1,2), Vec2(1,1), Vec2(1,1), Vec2(2,1)]
+	@test T.probs ≈ [ 0.1, 0.7, 0.1, 0.1 ]
 
-    # hist = simulate(sim, problem, policy, GridWorldState(1,1))
+	@test isterminal(problem, first(problem.terminate_in) ) == true
 
-    # for i in 1:length(hist.action_hist)
-    #     td = transition(problem, hist.state_hist[i], hist.action_hist[i])
-    #     @test sum(td.probs) ≈ 1.0 atol=0.01
-    #     for p in td.probs
-    #         @test p >= 0.0
-    #     end
-    # end
+	@test reward(problem, Vec2(4,3), :up) == -10.
+
+	for s in states(problem)
+		for a in actions(problem)
+			T = transition(problem, s, a)
+			@assert sum(T.probs) ≈ 1.00
+		end
+	end
+
+	problem = DiagonalGridWorld()
+
+	s = Vec2(1,1)
+	@test POMDPModels.inbounds(problem, s) == true
+
+	T = transition(problem, s, :n)
+	@test T.vals == [ Vec2(1,2), Vec2(1,1), Vec2(1,1), Vec2(1,1), Vec2(1,1), Vec2(1,1), Vec2(2,1), Vec2(2,2)]
+	@test T.probs ≈ [ 0.7, 0.3/7, 0.3/7, 0.3/7, 0.3/7, 0.3/7, 0.3/7, 0.3/7 ]
+
+	@test isterminal(problem, first(problem.terminate_in) ) == true
+
+	@test reward(problem, Vec2(4,3), :n) == -10.
+	@test reward(problem, Vec2(4,2), :n) == 0.
 
 
-    sv = convert_s(Array{Float64}, GridWorldState(1, 1, false), problem)
-    @test sv == [1.0, 1.0, 0.0]
-    sv = convert_s(Array{Float64}, GridWorldState(5, 3, false), problem)
-    @test sv == [5.0, 3.0, 0.0]
-    s = convert_s(GridWorldState, sv, problem)
-    @test s == GridWorldState(5, 3, false)
-
-    av = convert_a(Array{Float64}, :up, problem)
-    @test av == [0.0]
-    a = convert_a(Symbol, av, problem)
-    @test a == :up
-
-    @test GridWorldState(1,1,false) == GridWorldState(1,1,false)
-    @test hash(GridWorldState(1,1,false)) == hash(GridWorldState(1,1,false))
-    @test GridWorldState(1,2,false) != GridWorldState(1,1,false)
-    @test GridWorldState(1,2,true) == GridWorldState(1,1,true)
-    @test hash(GridWorldState(1,2,true)) == hash(GridWorldState(1,1,true))
-
-    trans_prob_consistency_check(problem)
+	for s in states(problem)
+		for a in actions(problem)
+			T = transition(problem, s, a)
+			@assert sum(T.probs) ≈ 1.00
+		end
+	end
 end
-
-# XXX simulation
-# let
-#     @nbinclude(joinpath(dirname(@__FILE__), "..", "notebooks", "GridWorld Visualization.ipynb"))
-# end
