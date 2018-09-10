@@ -53,6 +53,8 @@ export
 include("GridWorlds.jl")
 export
     GridWorld,
+    SimpleGridWorld,
+    DiagonalGridWorld,
     GridWorldState,
     GridWorldAction,
     GridWorldActionSpace,
